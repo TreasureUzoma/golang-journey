@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 type Blog struct {
@@ -17,28 +16,24 @@ type Blog struct {
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
-	id := strings.TrimPrefix(r.URL.Path, "/api/blog/")
-
+	// Build path to JSON file
 	path := filepath.Join("data", "blog.json")
+
+	// Read the JSON file
 	file, err := os.ReadFile(path)
 	if err != nil {
 		http.Error(w, "Error loading blog data", http.StatusInternalServerError)
 		return
 	}
 
+	// Parse JSON into slice of blogs
 	var blogs []Blog
 	if err := json.Unmarshal(file, &blogs); err != nil {
 		http.Error(w, "Error parsing blog data", http.StatusInternalServerError)
 		return
 	}
 
-	for _, blog := range blogs {
-		if blog.ID == id {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(blog)
-			return
-		}
-	}
-
-	http.Error(w, "Blog not found", http.StatusNotFound)
+	// Set content type and respond with JSON
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(blogs)
 }
