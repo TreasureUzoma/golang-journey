@@ -1,7 +1,6 @@
-package main
+package handler
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -34,9 +33,4 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
-}
-
-// Required main function
-func main() {
-	vercel.Start(context.Background(), Handler)
 }
